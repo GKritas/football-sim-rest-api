@@ -1,9 +1,12 @@
 package com.gkritas.footballsimrestapi.controller;
 
 import com.gkritas.footballsimrestapi.DTO.LeagueDTO;
+import com.gkritas.footballsimrestapi.DTO.TeamDTO;
 import com.gkritas.footballsimrestapi.mapper.LeagueMapper;
 import com.gkritas.footballsimrestapi.model.League;
+import com.gkritas.footballsimrestapi.model.Team;
 import com.gkritas.footballsimrestapi.modelAssembler.LeagueModelAssembler;
+import com.gkritas.footballsimrestapi.modelAssembler.TeamModelAssembler;
 import com.gkritas.footballsimrestapi.service.LeagueService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +35,8 @@ class LeagueControllerTest {
     private LeagueModelAssembler leagueModelAssembler;
     @Mock
     private LeagueMapper leagueMapper;
+    @Mock
+    private TeamModelAssembler teamModelAssembler;
 
     @InjectMocks
     private LeagueController leagueController;
@@ -40,6 +45,10 @@ class LeagueControllerTest {
     private LeagueDTO leagueDTO;
     private EntityModel<LeagueDTO> leagueModel;
     private List<League> leagues;
+    private Team team;
+    private TeamDTO teamDTO;
+    private EntityModel<TeamDTO> teamModel;
+    private List<Team> teams;
 
     @BeforeEach
     void setUp() {
@@ -51,10 +60,24 @@ class LeagueControllerTest {
         leagueDTO.setId(1L);
         leagueDTO.setName("Test League");
 
-        Link selfLink = linkTo(methodOn(LeagueController.class).getSingleLeague(league.getId())).withSelfRel();
-        Link allLink = linkTo(methodOn(LeagueController.class).getAllLeagues()).withRel("leagues");
-        leagueModel = EntityModel.of(leagueDTO, selfLink, allLink);
+        Link selfLeagueLink = linkTo(methodOn(LeagueController.class).getSingleLeague(league.getId())).withSelfRel();
+        Link allLeaguesLink = linkTo(methodOn(LeagueController.class).getAllLeagues()).withRel("leagues");
+        leagueModel = EntityModel.of(leagueDTO, selfLeagueLink, allLeaguesLink);
         leagues = List.of(league);
+
+        team = new Team();
+        team.setId(1L);
+        team.setName("Test Team");
+
+        teamDTO = new TeamDTO();
+        teamDTO.setId(1L);
+        teamDTO.setName("Test Team");
+
+        Link selfTeamLink = linkTo(methodOn(TeamController.class).getSingleTeam(team.getId())).withSelfRel();
+        Link allTeamsLink = linkTo(methodOn(TeamController.class).getAllTeams()).withRel("teams");
+        teamModel = EntityModel.of(teamDTO, selfTeamLink, allTeamsLink);
+        teams = List.of(team);
+        league.setTeams(teams);
     }
     @Test
     void getAllLeagues() {
@@ -120,5 +143,14 @@ class LeagueControllerTest {
 
     @Test
     void getTeamsOfLeague() {
+        when(leagueService.getLeagueById(1L)).thenReturn(league);
+        when(teamModelAssembler.toModel(team)).thenReturn(teamModel);
+
+        ResponseEntity<?> response = leagueController.getTeamsOfLeague(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(leagueService, times(1)).getLeagueById(1L);
+        verify(teamModelAssembler, times(teams.size())).toModel(team);
+
     }
 }

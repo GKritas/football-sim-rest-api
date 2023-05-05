@@ -5,6 +5,7 @@ import com.gkritas.footballsimrestapi.model.Season;
 import com.gkritas.footballsimrestapi.service.LeagueService;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Component
@@ -26,9 +27,13 @@ public class SeasonMapper {
         dto.setStartDate(season.getStartDate());
         dto.setEndDate(season.getEndDate());
         dto.setLeagueId(season.getLeague().getId());
-        dto.setMatches(season.getMatches()
-                .stream()
-                .map(matchMapper::toDTO).collect(Collectors.toList()));
+        if (season.getMatches() != null) {
+            dto.setMatches(season.getMatches()
+                    .stream()
+                    .map(matchMapper::toDTO).collect(Collectors.toList()));
+        } else {
+            dto.setMatches(new ArrayList<>());
+        }
 
         return dto;
     }
@@ -40,9 +45,13 @@ public class SeasonMapper {
         season.setStartDate(dto.getStartDate());
         season.setEndDate(dto.getEndDate());
         season.setLeague(leagueService.getLeagueById(dto.getLeagueId()));
-        season.setMatches(dto.getMatches()
-                .stream()
-                .map(matchMapper::toEntity).collect(Collectors.toList()));
+        if (dto.getMatches() != null) {
+            season.setMatches(dto.getMatches()
+                    .stream()
+                    .map(matchMapper::toEntity).collect(Collectors.toList()));
+        } else {
+            season.setMatches(new ArrayList<>());
+        }
 
         return season;
     }

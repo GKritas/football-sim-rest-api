@@ -30,13 +30,13 @@ public class LeagueMapper {
         dto.setId(league.getId());
         dto.setName(league.getName());
         dto.setSaveGameId(league.getSaveGame().getId());
-        if (dto.getSeasons() != null) {
+        if (league.getSeasons() != null) {
             dto.setSeasons(league.getSeasons().stream()
                     .map(seasonMapper::toDTO).collect(Collectors.toList()));
         } else {
             dto.setSeasons(new ArrayList<>());
         }
-        if (dto.getTeams() != null) {
+        if (league.getTeams() != null) {
             dto.setTeams(league.getTeams().stream()
                     .map(teamMapper::toDTO).collect(Collectors.toList()));
         } else {
@@ -52,13 +52,13 @@ public class LeagueMapper {
         league.setId(dto.getId());
         league.setName(dto.getName());
         league.setSaveGame(saveGame);
-        if (league.getSeasons() != null) {
+        if (dto.getSeasons() != null) {
             league.setSeasons(dto.getSeasons().stream()
                     .map(seasonMapper::toEntity).collect(Collectors.toList()));
         } else {
             league.setSeasons(new ArrayList<>());
         }
-        if (league.getTeams() != null) {
+        if (dto.getTeams() != null) {
             league.setTeams(dto.getTeams().stream()
                     .map(teamMapper::toEntity).collect(Collectors.toList()));
         } else {
