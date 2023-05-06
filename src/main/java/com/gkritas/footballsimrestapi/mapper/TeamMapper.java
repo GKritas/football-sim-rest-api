@@ -5,6 +5,7 @@ import com.gkritas.footballsimrestapi.model.Team;
 import com.gkritas.footballsimrestapi.service.LeagueService;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,9 +34,13 @@ public class TeamMapper {
         dto.setDraws(team.getDraws());
         dto.setLosses(team.getLosses());
         dto.setLeagueId(team.getLeague().getId());
-        dto.setPlayers(team.getPlayers()
-                .stream()
-                .map(playerMapper::toDTO).collect(Collectors.toList()));
+        if (team.getPlayers() != null) {
+            dto.setPlayers(team.getPlayers()
+                    .stream()
+                    .map(playerMapper::toDTO).collect(Collectors.toList()));
+        } else {
+            dto.setPlayers(new ArrayList<>());
+        }
 
         return dto;
     }
@@ -54,9 +59,13 @@ public class TeamMapper {
         team.setDraws(dto.getDraws());
         team.setLosses(dto.getLosses());
         team.setLeague(leagueService.getLeagueById(dto.getLeagueId()));
-        team.setPlayers(dto.getPlayers()
-                .stream()
-                .map(playerMapper::toEntity).collect(Collectors.toList()));
+        if (dto.getPlayers() != null) {
+            team.setPlayers(dto.getPlayers()
+                    .stream()
+                    .map(playerMapper::toEntity).collect(Collectors.toList()));
+        } else {
+            team.setPlayers(new ArrayList<>());
+        }
 
         return team;
     }
